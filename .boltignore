@@ -1,0 +1,87 @@
+# .boltignore - Exclude files to optimize token usage in conversations
+
+# Build and distribution files
+dist/
+build/
+public/
+*.min.js
+*.min.css
+
+# Dependencies and package files
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Configuration files (keep essential ones visible)
+tsconfig.json
+vite.config.ts
+eslint.config.js
+drizzle.config.ts
+postcss.config.js
+tailwind.config.ts
+
+# Git and version control
+.git/
+.gitignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+.temp/
+
+# UI component library files (shadcn/ui components)
+client/src/components/ui/
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+coverage/
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# Environment files (keep structure visible but exclude sensitive data)
+.env.local
+.env.production
+.env.development
+
+# Backup and duplicate files
+*.backup
+*.bak
+*-backup.*
+*-test.*
+client/src/pages/audio-hug-backup.tsx
+client/src/pages/audio-hug-test.tsx
+client/src/pages/audio-hug-test-fork.tsx
+
+# Firebase and external service configs (keep main config visible)
+client/src/firebaseConfig.tsx
+
+# Duplicate or legacy components
+client/src/components/AuthButtons.tsx
+client/src/components/SoulHugRecorder.tsx
+client/src/components/SoulHugVoicePlayer.tsx
+client/src/firebase.ts
+
+# Generated or compiled files
+*.d.ts
+*.map

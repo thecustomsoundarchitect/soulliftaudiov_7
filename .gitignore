@@ -1,0 +1,12 @@
+node_modules/
+attached_assets/
+.replit
+*.tar.gz
+*.jpg
+*.png
+*.zip
+*.log
+*.html
+*.md
+internal_docs/
+.env
