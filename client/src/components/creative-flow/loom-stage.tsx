@@ -185,7 +185,7 @@ export default function LoomStage({
   const handleContinueToAudio = () => {
     // Save session data to localStorage for the craft page
     localStorage.setItem('creativeFlowSession', JSON.stringify({
-      ...session,
+      onContinueToAudio();
       finalMessage: message
     }));
     // Navigate to craft page instead of setting stage
@@ -481,18 +481,12 @@ export default function LoomStage({
           <i className="fas fa-paper-plane mr-2"></i>Send as Message
         </Button>
         <Button
-          onClick={() => {
-            console.log('Continue to Craft Soul Hug button clicked');
-            if (message.trim()) {
-              handleContinueToAudio();
-            } else {
-              alert('Please create a message before continuing.');
-            }
-          }}
+          onClick={handleContinueToAudio}
           disabled={!message.trim()}
           className="bg-gradient-to-r from-teal-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:from-teal-700 hover:to-indigo-700 transition-transform transform hover:scale-105 disabled:opacity-50"
         >
           <i className="fas fa-arrow-right mr-2"></i>Continue to Craft
+          Continue to Audio Features
         </Button>
       </div>
     </div>

@@ -23,7 +23,6 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/creative-flow" component={CreativeFlow} />
-      <Route path="/craft-soul-hug" component={CraftSoulHug} />
       <Route path="/audio-hug" component={AudioHug} />
       <Route path="/audio-hug-test" component={AudioHugTest} />
       <Route path="/audio-hug-test-fork" component={AudioHugTestFork} />
