@@ -188,7 +188,8 @@ export default function LoomStage({
       ...session,
       finalMessage: message
     }));
-    onContinueToAudio();
+    // Navigate to craft page instead of setting stage
+    window.location.href = '/craft-soul-hug';
   };
 
   return (

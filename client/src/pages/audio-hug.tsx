@@ -14,7 +14,7 @@ import {
   ArrowLeft,
   ArrowRight,
 } from 'lucide-react';
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 /* -------------------------------------------------
    Progress Stepper
@@ -641,6 +641,7 @@ const DeliveryOptions = () => {
    Main Component
 -------------------------------------------------- */
 export default function AudioHugPage() {
+  const [, setLocation] = useLocation();
   const soulHugMessage = `Dear Sarah,
 
 I've been thinking about you today and wanted to reach out with a message from my heart to yours. Your kindness has been such a light in my life, and I wanted you to know how deeply appreciated you are.
@@ -720,13 +721,13 @@ With love and gratitude`;
 
         {/* Navigation */}
         <div className="flex justify-between items-center mt-8">
-          <Link href="/craft-soul-hug" className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
+          <button onClick={() => setLocation('/craft-soul-hug')} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back
-          </Link>
-          <Link href="/my-hugs" className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
+          </button>
+          <button onClick={() => setLocation('/my-hugs')} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
             Next <ArrowRight className="w-4 h-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

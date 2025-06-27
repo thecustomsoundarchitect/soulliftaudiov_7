@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { useCreativeFlow } from "@/hooks/use-creative-flow";
-import StageNavigation from "@/components/creative-flow/stage-navigation";
 import AnchorStage from "@/components/creative-flow/anchor-stage";
 import PaletteStage from "@/components/creative-flow/palette-stage";
 import LoomStage from "@/components/creative-flow/loom-stage";
 import IngredientModal from "@/components/creative-flow/ingredient-modal";
-import AudioHug from "@/pages/audio-hug";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function CreativeFlow() {
+  const [, setLocation] = useLocation();
   const {
     state,
     currentStage,
@@ -173,17 +172,11 @@ export default function CreativeFlow() {
     if (state.session) {
       localStorage.setItem('creativeFlowSession', JSON.stringify(state.session));
     }
-    setCurrentStage('audio');
+    setLocation('/craft-soul-hug');
   };
 
   return (
     <div className="text-slate-800 min-h-screen p-4">
-      <div id="stage-navigation">
-        <StageNavigation 
-          currentStage={currentStage} 
-          onStageClick={setCurrentStage}
-        />
-      </div>
       
       <div className="flex items-center justify-center">
         {currentStage === 'intention' && (
@@ -228,11 +221,6 @@ export default function CreativeFlow() {
           </div>
         )}
         
-        {currentStage === 'audio' && state.session && (
-          <div id="audio-stage" className="relative w-full">
-            <AudioHug />
-          </div>
-        )}
       </div>
       
       <IngredientModal
@@ -250,17 +238,6 @@ export default function CreativeFlow() {
           </div>
         </div>
       )}
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center mt-8 px-6">
-        <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Link>
-        <Link href="/craft-soul-hug" className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
-          Next <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
     </div>
   );
 }
