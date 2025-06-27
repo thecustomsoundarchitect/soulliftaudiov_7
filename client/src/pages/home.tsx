@@ -55,7 +55,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto space-y-6 mb-12">
           
           <Link 
-            href="/define"
+            href="/creative-flow"
             className="group block bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:bg-white/10"
           >
             <div className="flex items-center justify-between">
