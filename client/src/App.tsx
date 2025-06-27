@@ -15,9 +15,6 @@ import HugPlayback from "@/pages/hug-playback";
 import AdminDashboard from "@/pages/admin-dashboard";
 import PricingPage from "@/pages/pricing";
 import NotFound from "@/pages/not-found";
-import AuthModal from "@/components/auth/AuthModal";
-import UserProfile from "@/components/auth/UserProfile";
-import { useState } from "react";
 
 function Router() {
   return (

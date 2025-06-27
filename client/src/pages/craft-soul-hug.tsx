@@ -209,7 +209,7 @@ export default function CraftSoulHug() {
             className="flex items-center gap-2 px-6 py-3 text-slate-600 border-slate-300 hover:bg-slate-50"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Gather
+            ← Back to Gather
           </Button>
           
           <Button
