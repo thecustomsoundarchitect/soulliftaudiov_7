@@ -4,7 +4,7 @@ import AnchorStage from "@/components/creative-flow/anchor-stage";
 import PaletteStage from "@/components/creative-flow/palette-stage";
 import LoomStage from "@/components/creative-flow/loom-stage";
 import IngredientModal from "@/components/creative-flow/ingredient-modal";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import { auth } from "@/lib/firebase";
@@ -168,11 +168,11 @@ export default function CreativeFlow() {
   };
 
   const handleContinueToAudio = () => {
-    // Save session data to localStorage for the audio page
+    // Save session data to localStorage for the craft page
     if (state.session) {
       localStorage.setItem('creativeFlowSession', JSON.stringify(state.session));
     }
-    setLocation('/audio-hug');
+    setLocation('/craft-soul-hug');
   };
 
   return (
@@ -220,6 +220,7 @@ export default function CreativeFlow() {
             />
           </div>
         )}
+        
       </div>
       
       <IngredientModal
@@ -237,14 +238,6 @@ export default function CreativeFlow() {
           </div>
         </div>
       )}
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center mt-8 px-6">
-        <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </Link>
-      </div>
     </div>
   );
 }
