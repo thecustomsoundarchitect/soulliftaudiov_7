@@ -4,7 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import HomePage from "@/pages/home";
-import CreativeFlow from "@/pages/creative-flow";
+import Define from "@/pages/define";
+import Gather from "@/pages/gather";
 import CraftSoulHug from "@/pages/craft-soul-hug";
 import AudioHug from "@/pages/audio-hug";
 import AudioHugTest from "@/pages/audio-hug-test";
@@ -22,7 +23,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/creative-flow" component={CreativeFlow} />
+      <Route path="/define" component={Define} />
+      <Route path="/gather" component={Gather} />
       <Route path="/craft-soul-hug" component={CraftSoulHug} />
       <Route path="/audio-hug" component={AudioHug} />
       <Route path="/audio-hug-test" component={AudioHugTest} />

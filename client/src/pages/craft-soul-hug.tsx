@@ -204,12 +204,12 @@ export default function CraftSoulHug() {
         {/* Navigation */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-12 max-w-7xl mx-auto">
           <Button
-            onClick={handleBack}
+            onClick={() => setLocation("/gather")}
             variant="outline"
             className="flex items-center gap-2 px-6 py-3 text-slate-600 border-slate-300 hover:bg-slate-50"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Creative Flow
+            Back to Gather
           </Button>
           
           <Button
