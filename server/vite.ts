@@ -45,20 +45,28 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
-      // CORRECTED PATH: Look for index.html at the project root
+      // This path needs to be absolute from the project root.
+      // Since index.html is now at the root, we resolve to it directly.
       const clientTemplate = path.resolve(
         import.meta.dirname,
-        "..", // Moves up from 'server/' to project root
-        "index.html", // Now correctly points to the root index.html
+        "..", // Go up from 'server/' to the project root
+        "index.html", // Directly target index.html at the root
       );
 
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
+
+      // CORRECTED REPLACEMENT: Only add nanoid for cache busting,
+      // the path itself should remain '/src/main.tsx' relative to Vite's root (which is 'client')
+      // OR, if Vite's root is '.', then '/client/src/main.tsx'
+      // Given Bolt AI's diagnosis, it implies Vite's root is 'client'.
+      // So, the script tag in index.html should say /src/main.tsx (relative to client)
+      // and this replacement just adds the ?v=nanoid() for cache busting.
       template = template.replace(
-        // Since Vite root is set to 'client' directory, paths are relative to that
-        `src="/src/main.tsx"`, // Original placeholder in index.html
-        `src="/src/main.tsx?v=${nanoid()}"`, // Keep relative to client root
+        `src="/src/main.tsx"`, // Original script src in index.html
+        `src="/src/main.tsx?v=${nanoid()}"`, // Corrected replacement, adding version for cache busting
       );
+
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
@@ -70,7 +78,7 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   // Corrected path to serve static assets from the 'dist' folder at the root
-  const distPath = path.resolve(import.meta.dirname, "..", "dist"); // Moves up from 'server/' to root, then into 'dist'
+  const distPath = path.resolve(import.meta.dirname, "..", "dist"); // Go up from 'server/' to root, then into 'dist'
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -85,4 +93,3 @@ export function serveStatic(app: Express) {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
-
