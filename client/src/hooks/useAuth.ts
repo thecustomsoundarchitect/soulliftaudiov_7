@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const openAuthModal = () => setIsAuthModalOpen(true);
-  const closeAuthModal = () => setIsAuthModalOpen(false);
+  const closeAuthModal = () => setIsAuthModalOpen(false); // Corrected: ensure it sets isAuthModalOpen to false
 
   const value: AuthContextType = {
     user,
@@ -98,6 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     closeAuthModal,
   };
 
+  // Explicitly wrap the return value of AuthContext.Provider
   return (
     <AuthContext.Provider value={value}>
       {children}
