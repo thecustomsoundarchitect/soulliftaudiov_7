@@ -3,9 +3,11 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import NavBar from "@/components/NavBar";
 import HomePage from "@/pages/home";
-import CreativeFlow from "@/pages/creative-flow";
-import CraftSoulHug from "@/pages/craft-soul-hug";
+import DefinePage from "@/pages/define";
+import GatherPage from "@/pages/gather";
+import CraftPage from "@/pages/craft";
 import AudioHug from "@/pages/audio-hug";
 import AudioHugTest from "@/pages/audio-hug-test";
 import AudioHugTestFork from "@/pages/audio-hug-test-fork";
@@ -14,16 +16,14 @@ import HugPlayback from "@/pages/hug-playback";
 import AdminDashboard from "@/pages/admin-dashboard";
 import PricingPage from "@/pages/pricing";
 import NotFound from "@/pages/not-found";
-import AuthModal from "@/components/auth/AuthModal";
-import UserProfile from "@/components/auth/UserProfile";
-import { useState } from "react";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/creative-flow" component={CreativeFlow} />
-      <Route path="/craft-soul-hug" component={CraftSoulHug} />
+      <Route path="/define" component={DefinePage} />
+      <Route path="/gather" component={GatherPage} />
+      <Route path="/craft" component={CraftPage} />
       <Route path="/audio-hug" component={AudioHug} />
       <Route path="/audio-hug-test" component={AudioHugTest} />
       <Route path="/audio-hug-test-fork" component={AudioHugTestFork} />
@@ -41,6 +41,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen">
+          <NavBar />
           <Router />
         </div>
         <Toaster />
