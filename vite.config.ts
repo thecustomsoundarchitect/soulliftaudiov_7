@@ -1,9 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 export default defineConfig({
+  root: ".", // Set root to the project root (where index.html will be)
   plugins: [
     react(),
     runtimeErrorOverlay(),
@@ -18,19 +22,19 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@": path.resolve(__dirname, "./client/src"), // Keep client/src aliased to @
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
   root: path.resolve(import.meta.dirname, "client"),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: "dist/public", // Ensure this is correct for your build output
     emptyOutDir: true,
   },
   server: {
     fs: {
-      strict: true,
+      "/api": "http://localhost:5000", // Or your backend port
       deny: ["**/.*"],
     },
   },
