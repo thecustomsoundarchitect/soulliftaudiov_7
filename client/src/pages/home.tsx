@@ -8,7 +8,6 @@ export default function HomePage() {
   const { user, openAuthModal } = useAuth();
   const [credits, setCredits] = useState(0);
 
-
   // Fetch user credits when user changes
   useEffect(() => {
     async function fetchCredits() {
@@ -47,7 +46,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto space-y-6 mb-12">
           
           <Link 
-            href="/define"
+            href="/creative-flow"
             className="group block bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:bg-white/10"
           >
             <div className="flex items-center justify-between">
@@ -134,15 +133,6 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center space-x-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-xl px-6 py-4 border border-red-500/20 hover:border-red-500/40 transition-all duration-200"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
-            </button>
           </div>
         ) : (
           <div className="text-center">
@@ -155,7 +145,6 @@ export default function HomePage() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

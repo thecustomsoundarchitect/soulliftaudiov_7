@@ -7,10 +7,10 @@ export default function NavBar() {
   const { user, signOut, openAuthModal } = useAuth();
 
   const navItems = [
-    { path: "/define", label: "Define" },
-    { path: "/gather", label: "Gather" },
-    { path: "/craft", label: "Craft" },
-    { path: "/audio-hug", label: "Audio Hug" }
+    { path: "/creative-flow", label: "Creative Flow" },
+    { path: "/craft-soul-hug", label: "Craft" },
+    { path: "/audio-hug", label: "Audio Hug" },
+    { path: "/my-hugs", label: "My Hugs" }
   ];
 
   return (
@@ -43,16 +43,8 @@ export default function NavBar() {
             })}
           </ul>
 
-          {/* Home Link */}
+          {/* Auth Section */}
           <div className="flex items-center gap-4">
-            <Link 
-              href="/" 
-              className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              Home
-            </Link>
-            
-            {/* Auth Button */}
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-slate-600">
