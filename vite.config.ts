@@ -25,8 +25,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./client/src"), // Keep client/src aliased to @
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
-    },
-    outDir: "../dist/public",
+    }
+  },
+  outDir: "../dist/public",
   root: path.resolve(import.meta.dirname, "client"),
   build: {
     outDir: "dist/public", // Ensure this is correct for your build output
