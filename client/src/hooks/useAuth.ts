@@ -1,16 +1,24 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { app } from '../lib/firebase'; // Ensure 'app' is imported correctly based on your firebase.ts location
-// import AuthModal from '@/components/auth/AuthModal'; // Temporarily comment out AuthModal import
+import { 
+  User, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  AuthError
+} from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
+import { initUserCredits } from '@/services/creditService';
 
-// Minimal AuthContextType for testing
 interface AuthContextType {
-  user: any;
+  user: User | null;
   loading: boolean;
-  // Temporarily remove specific auth functions for initial compile test
-  signInWithEmail: (email: string, password: string) => Promise<any>;
-  signUpWithEmail: (email: string, password: string) => Promise<any>;
-  signInWithGoogle: () => Promise<any>;
+  signInWithEmail: (email: string, password: string) => Promise<User>;
+  signUpWithEmail: (email: string, password: string) => Promise<User>;
+  signInWithGoogle: (useRedirect?: boolean) => Promise<User | null>;
   signOut: () => Promise<void>;
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
@@ -20,27 +28,158 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Temporarily stub out auth functions for initial compile test
-  const auth = getAuth(app);
-  const signInWithEmail = async (email: string, password: string) => { console.log('Dummy signInWithEmail'); return Promise.resolve(null); };
-  const signUpWithEmail = async (email: string, password: string) => { console.log('Dummy signUpWithEmail'); return Promise.resolve(null); };
-  const signInWithGoogle = async () => { console.log('Dummy signInWithGoogle'); return Promise.resolve(null); };
-  const signOut = async () => { console.log('Dummy signOut'); return Promise.resolve(); };
-  const openAuthModal = () => setIsAuthModalOpen(true);
-  const closeAuthModal = () => setIsAuthModalOpen(false);
-
   useEffect(() => {
-    // Minimal listener for testing
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    console.log('Setting up auth state listener...');
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user ? `✅ User signed in: ${user.email}` : '❌ User is signed out');
+      setUser(user);
+      
+      // Initialize user credits when they sign in
+      if (user) {
+        try {
+          await initUserCredits();
+          console.log('User credits initialized');
+        } catch (error) {
+          console.error('Failed to initialize user credits:', error);
+        }
+      }
+      
+      setLoading(false);
+    }, (error) => {
+      console.error('Auth state change error:', error);
       setLoading(false);
     });
-    return () => unsubscribe();
-  }, [auth]);
+
+    // Check for redirect result on app load
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          console.log('Google sign-in via redirect successful:', result.user.email);
+        }
+      } catch (error: any) {
+        console.error('Redirect result error:', error);
+      }
+    };
+
+    checkRedirectResult();
+
+    return unsubscribe;
+  }, []);
+
+  const signInWithEmail = async (email: string, password: string) => {
+    try {
+      console.log('Attempting email sign-in for:', email);
+      setLoading(true);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Email sign-in successful:', result.user.email);
+      return result.user;
+    } catch (error: any) {
+      console.error('Email sign-in error:', error.code, error.message);
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to sign in. Please try again.';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later.';
+      }
+      
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    try {
+      console.log('Attempting email sign-up for:', email);
+      setLoading(true);
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('Email sign-up successful:', result.user.email);
+      return result.user;
+    } catch (error: any) {
+      console.error('Email sign-up error:', error.code, error.message);
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to create account. Please try again.';
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'An account with this email already exists.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password should be at least 6 characters long.';
+      }
+      
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithGoogle = async (useRedirect: boolean = false) => {
+    try {
+      console.log('Attempting Google sign-in...', useRedirect ? 'via redirect' : 'via popup');
+      setLoading(true);
+      
+      if (useRedirect) {
+        // Use redirect method as fallback
+        await signInWithRedirect(auth, googleProvider);
+        // Note: The redirect will reload the page, so we won't reach this point
+        // The actual sign-in result will be handled by getRedirectResult in useEffect
+        return null;
+      } else {
+        // Try popup method first
+        const result = await signInWithPopup(auth, googleProvider);
+        console.log('Google sign-in successful:', result.user.email);
+        return result.user;
+      }
+    } catch (error: any) {
+      console.error('Google sign-in error:', error.code, error.message);
+      
+      // If popup is blocked, automatically try redirect method
+      if (error.code === 'auth/popup-blocked') {
+        console.log('Popup blocked, trying redirect method...');
+        return await signInWithGoogle(true);
+      }
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to sign in with Google. Please try again.';
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMessage = 'Sign-in was cancelled. Please try again.';
+      } else if (error.code === 'auth/popup-blocked') {
+        errorMessage = 'Popup was blocked. Redirecting to Google sign-in...';
+      }
+      
+      throw new Error(errorMessage);
+    } finally {
+      if (!useRedirect) {
+        setLoading(false);
+      }
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      console.log('Signing out user...');
+      await firebaseSignOut(auth);
+      console.log('User signed out successfully');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    }
+  };
+
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
 
   const value: AuthContextType = {
     user,
@@ -54,14 +193,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     closeAuthModal,
   };
 
-  // SIMPLIFIED RETURN FOR COMPILATION TEST
   return (
-    <div> {/* Use a simple div instead of AuthContext.Provider for initial test */}
+    <AuthContext.Provider value={value}>
       {children}
-      {/* Temporarily remove AuthModal rendering for initial compile test */}
-      {/* <AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} /> */}
-      <p>Auth Provider Test</p>
-    </div>
+      {/* Auth Modal will be rendered here when we add it back */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h2 className="text-xl font-bold mb-4">Sign In Required</h2>
+            <p className="text-gray-600 mb-4">Please sign in to continue using SoulLift.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={closeAuthModal}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => signInWithGoogle()}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Sign In with Google
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </AuthContext.Provider>
   );
 };
 
