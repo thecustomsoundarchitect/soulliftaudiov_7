@@ -1,180 +1,98 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { 
-  User, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  AuthError
-} from 'firebase/auth';
-import { auth, googleProvider, app } from '@/lib/firebase';
-import { initUserCredits } from '@/services/creditService';
-import AuthModal from '@/components/auth/AuthModal';
+import { onAuthStateChanged, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'; // Ensure all necessary Firebase auth functions are imported
+import { getAuth } from 'firebase/auth';
+import { app } from '../lib/firebase'; // Ensure 'app' is imported correctly based on your firebase.ts location
+import AuthModal from '@/components/auth/AuthModal'; // Ensure AuthModal is imported
 
-// Create Auth Context
-const AuthContext = createContext<any>(null);
+// Define a proper type for AuthContext value for better type safety
+interface AuthContextType {
+  user: any; // You can refine this type later (e.g., firebase.User | null)
+  loading: boolean;
+  signInWithEmail: (email: string, password: string) => Promise<any>;
+  signUpWithEmail: (email: string, password: string) => Promise<any>;
+  signInWithGoogle: () => Promise<any>;
+  signOut: () => Promise<void>;
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined); // Use undefined for initial value
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null); // Refine type here too
   const [loading, setLoading] = useState(true);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); // State for modal visibility
+
+  const auth = getAuth(app); // Get auth instance using your imported 'app'
 
   useEffect(() => {
-    console.log('Setting up auth state listener...');
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed:', user ? `✅ User signed in: ${user.email}` : '❌ User is signed out');
-      setUser(user);
-      
-      // Initialize user credits when they sign in
-      if (user) {
-        try {
-          await initUserCredits();
-          console.log('User credits initialized');
-          // Close modal on successful sign-in
-          setIsAuthModalOpen(false);
-        } catch (error) {
-          console.error('Failed to initialize user credits:', error);
-        }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+      if (currentUser) {
+        // If a user signs in, close the modal
+        setIsAuthModalOpen(false);
       }
-      
-      setLoading(false);
-    }, (error) => {
-      console.error('Auth state change error:', error);
-      setLoading(false);
     });
+    return () => unsubscribe(); // Cleanup subscription
+  }, [auth]);
 
-    // Check for redirect result on app load
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          console.log('Google sign-in via redirect successful:', result.user.email);
-        }
-      } catch (error: any) {
-        console.error('Redirect result error:', error);
-      }
-    };
-
-    checkRedirectResult();
-
-    return unsubscribe;
-  }, []);
-
+  // Firebase Auth functions (ensure these are correctly implemented and called)
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      console.log('Attempting email sign-in for:', email);
-      setLoading(true);
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Email sign-in successful:', result.user.email);
-      return result.user;
-    } catch (error: any) {
-      console.error('Email sign-in error:', error.code, error.message);
-      
-      // Provide user-friendly error messages
-      let errorMessage = 'Failed to sign in. Please try again.';
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email address.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Please enter a valid email address.';
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Too many failed attempts. Please try again later.';
-      }
-      
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      return userCredential.user;
+    } catch (error) {
+      console.error("Sign-in with email failed:", error);
+      throw error; // Re-throw to be caught by AuthModal's handler
     }
   };
 
   const signUpWithEmail = async (email: string, password: string) => {
     try {
-      console.log('Attempting email sign-up for:', email);
-      setLoading(true);
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Email sign-up successful:', result.user.email);
-      return result.user;
-    } catch (error: any) {
-      console.error('Email sign-up error:', error.code, error.message);
-      
-      // Provide user-friendly error messages
-      let errorMessage = 'Failed to create account. Please try again.';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'An account with this email already exists.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Please enter a valid email address.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password should be at least 6 characters long.';
-      }
-      
-      throw new Error(errorMessage);
-    } finally {
-      setLoading(false);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      return userCredential.user;
+    } catch (error) {
+      console.error("Sign-up with email failed:", error);
+      throw error;
     }
   };
 
-  const signInWithGoogle = async (useRedirect: boolean = false) => {
+  const signInWithGoogle = async () => {
     try {
-      console.log('Attempting Google sign-in...', useRedirect ? 'via redirect' : 'via popup');
-      setLoading(true);
-      
-      if (useRedirect) {
-        // Use redirect method as fallback
-        await signInWithRedirect(auth, googleProvider);
-        // Note: The redirect will reload the page, so we won't reach this point
-        // The actual sign-in result will be handled by getRedirectResult in useEffect
-        return null;
-      } else {
-        // Try popup method first
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('Google sign-in successful:', result.user.email);
-        return result.user;
-      }
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      return result.user;
     } catch (error: any) {
-      console.error('Google sign-in error:', error.code, error.message);
-      
-      // If popup is blocked, automatically try redirect method
-      if (error.code === 'auth/popup-blocked') {
-        console.log('Popup blocked, trying redirect method...');
-        return await signInWithGoogle(true);
-      }
-      
-      // Provide user-friendly error messages
-      let errorMessage = 'Failed to sign in with Google. Please try again.';
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMessage = 'Sign-in was cancelled. Please try again.';
-      } else if (error.code === 'auth/popup-blocked') {
-        errorMessage = 'Popup was blocked. Redirecting to Google sign-in...';
-      }
-      
-      throw new Error(errorMessage);
-    } finally {
-      if (!useRedirect) {
-        setLoading(false);
+      console.error("Sign-in with Google failed:", error);
+      // Special handling for popup blocked error or redirect
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        // User closed popup, no need to show error toast directly unless severe
+      } else if (error.message.includes('auth/redirect-cancelled') || error.message.includes('auth/operation-not-supported-in-this-environment')) {
+         // This might happen in certain environments or if redirect is implicitly used
+         console.warn('Google sign-in might be attempting redirect. Ensure proper redirect URI settings.');
+         throw new Error("Redirecting to Google for sign-in. Please wait."); // Informative message for toast
+      } else {
+        throw error; // Re-throw general errors
       }
     }
   };
 
   const signOut = async () => {
     try {
-      console.log('Signing out user...');
       await firebaseSignOut(auth);
-      console.log('User signed out successfully');
+      // Optional: clear any local session data if necessary
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign-out failed:", error);
       throw error;
     }
   };
 
-  // New functions to control auth modal
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
-  const value = {
+  const value: AuthContextType = { // Explicitly type the 'value' object
     user,
     loading,
     signInWithEmail,
@@ -186,19 +104,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     closeAuthModal,
   };
 
+  // The rendering of the AuthProvider and AuthModal
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={value}> {/* THIS IS THE LINE THAT WAS LIKELY CAUSING THE ERROR */}
       {children}
-      {/* Render AuthModal here, controlled by AuthContext */}
+      {/* AuthModal is now rendered by the AuthProvider, so it's globally available */}
       <AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
     </AuthContext.Provider>
   );
 };
 
+// Custom hook to use the authentication context
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};
