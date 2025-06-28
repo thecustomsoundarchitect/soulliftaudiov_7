@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { onAuthStateChanged, signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getAuth } from 'firebase/auth'; // Correct import
+import { getAuth } from 'firebase/auth';
 import { app } from '../lib/firebase';
 import AuthModal from '@/components/auth/AuthModal';
 
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const openAuthModal = () => setIsAuthModalOpen(true);
-  const closeAuthModal = () => setIsAuthModalOpen(false); // Corrected: ensure it sets isAuthModalOpen to false
+  const closeAuthModal = () => setIsAuthModalOpen(false);
 
   const value: AuthContextType = {
     user,
@@ -98,7 +98,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     closeAuthModal,
   };
 
-  // Explicitly wrap the return value of AuthContext.Provider
   return (
     <AuthContext.Provider value={value}>
       {children}
