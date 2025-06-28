@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return result.user;
     } catch (error: any) {
       console.error("Sign-in with Google failed:", error);
-      // Special handling for popup blocked error or redirect
+      // Special handling for popup blocked error
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
         // User closed popup, no need to show error toast directly unless severe
       } else if (error.message.includes('auth/redirect-cancelled') || error.message.includes('auth/operation-not-supported-in-this-environment')) {
