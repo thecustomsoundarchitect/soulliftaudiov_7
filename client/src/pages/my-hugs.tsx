@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { auth, db } from "@/lib/firebase";
-import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, query, where, deleteDoc, doc, Timestamp } from "firebase/firestore";
 import { useLocation, Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
 
@@ -12,7 +12,7 @@ interface SoulHug {
   message: string;
   audioUrl?: string;
   imageUrl?: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 export default function MyHugs() {

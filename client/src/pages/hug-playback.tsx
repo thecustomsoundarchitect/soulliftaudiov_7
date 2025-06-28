@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface SoulHug {
@@ -11,7 +11,7 @@ interface SoulHug {
   message: string;
   imageUrl?: string;
   audioUrl?: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 export default function HugPlayback() {

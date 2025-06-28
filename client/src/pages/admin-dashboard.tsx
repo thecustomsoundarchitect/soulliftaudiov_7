@@ -2,7 +2,7 @@
 // Description: Admin analytics page showing Soul Hug usage statistics
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, Timestamp } from "firebase/firestore";
 import { useLocation } from "wouter";
 import { auth, db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ interface SoulHug {
   tone: string;
   relationship: string;
   occasion?: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
   userId: string;
   creditsUsed: number;
 }
