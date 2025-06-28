@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
+import viteConfig from "../vite.config"; // Ensure this path is correct relative to server/
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
@@ -28,12 +28,12 @@ export async function setupVite(app: Express, server: Server) {
 
   const vite = await createViteServer({
     ...viteConfig,
-    configFile: false,
+    configFile: false, // Vite config will be passed directly
     customLogger: {
       ...viteLogger,
       error: (msg, options) => {
         viteLogger.error(msg, options);
-        process.exit(1);
+        process.exit(1); // Exit if Vite encounters an error
       },
     },
     server: serverOptions,
@@ -45,18 +45,19 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
+      // CORRECTED PATH: Look for index.html at the project root
       const clientTemplate = path.resolve(
         import.meta.dirname,
-        "..",
-        "client",
-        "index.html",
+        "..", // Moves up from 'server/' to project root
+        "index.html", // Now correctly points to the root index.html
       );
 
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`,
+        // Ensure this script path correctly points to client/src/main.tsx from index.html at root
+        `src="/src/main.tsx"`, // Original placeholder in index.html
+        `src="/client/src/main.tsx?v=${nanoid()}"`, // Actual path to main.tsx in your project structure
       );
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
@@ -68,7 +69,8 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // Corrected path to serve static assets from the 'dist' folder at the root
+  const distPath = path.resolve(import.meta.dirname, "..", "dist"); // Moves up from 'server/' to root, then into 'dist'
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -83,3 +85,4 @@ export function serveStatic(app: Express) {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
+
