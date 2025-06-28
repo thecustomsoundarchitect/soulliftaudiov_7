@@ -55,9 +55,9 @@ export async function setupVite(app: Express, server: Server) {
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
-        // Ensure this script path correctly points to client/src/main.tsx from index.html at root
+        // Since Vite root is set to 'client' directory, paths are relative to that
         `src="/src/main.tsx"`, // Original placeholder in index.html
-        `src="/client/src/main.tsx?v=${nanoid()}"`, // Actual path to main.tsx in your project structure
+        `src="/src/main.tsx?v=${nanoid()}"`, // Keep relative to client root
       );
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
