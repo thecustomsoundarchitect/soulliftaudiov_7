@@ -1,21 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserCredits, addUserCredits } from "@/services/creditService";
-import AuthModal from "@/components/auth/AuthModal";
-import { ArrowRight, Plus, Eye, Headphones, User, LogOut, Coins } from "lucide-react";
+import { ArrowRight, Plus, Eye, Headphones, User, Coins } from "lucide-react";
 
 export default function HomePage() {
-  const { user } = useAuth();
-  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const { user, openAuthModal } = useAuth();
   const [credits, setCredits] = useState(0);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    window.location.reload();
-  };
 
   // Fetch user credits when user changes
   useEffect(() => {
@@ -155,7 +147,7 @@ export default function HomePage() {
         ) : (
           <div className="text-center">
             <button
-              onClick={() => setAuthModalOpen(true)}
+              onClick={openAuthModal}
               className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/20 hover:border-white/40 transition-all duration-200 font-medium"
             >
               Sign In or Create Account
@@ -164,10 +156,6 @@ export default function HomePage() {
         )}
       </div>
 
-      <AuthModal 
-        open={authModalOpen} 
-        onOpenChange={setAuthModalOpen} 
-      />
     </div>
   );
 }

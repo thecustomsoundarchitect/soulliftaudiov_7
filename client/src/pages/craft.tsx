@@ -10,9 +10,11 @@ import { useCreativeFlow } from "@/hooks/use-creative-flow";
 import { auth } from "@/lib/firebase";
 import { saveSoulHug } from "@shared/soulHugs";
 import { getUserCredits, deductUserCredits } from "@/services/creditService";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CraftPage() {
   const [, setLocation] = useLocation();
+  const { user, openAuthModal } = useAuth();
   const { 
     session, 
     updateSession, 
@@ -70,8 +72,8 @@ export default function CraftPage() {
   };
 
   const handleAIWeave = async () => {
-    if (!auth.currentUser) {
-      alert("Please sign in to use AI features.");
+    if (!user) {
+      openAuthModal();
       return;
     }
     
@@ -118,8 +120,8 @@ export default function CraftPage() {
   };
 
   const handleAIStitch = async () => {
-    if (!auth.currentUser) {
-      alert("Please sign in to use AI features.");
+    if (!user) {
+      openAuthModal();
       return;
     }
     
@@ -174,10 +176,9 @@ export default function CraftPage() {
   };
 
   const sendAsMessage = async () => {
-    const user = auth.currentUser;
 
     if (!user) {
-      alert("Please sign in to send a Soul Hug.");
+      openAuthModal();
       return;
     }
 

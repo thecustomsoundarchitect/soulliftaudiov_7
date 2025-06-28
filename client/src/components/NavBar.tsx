@@ -1,7 +1,10 @@
 import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function NavBar() {
   const [location] = useLocation();
+  const { user, signOut, openAuthModal } = useAuth();
 
   const navItems = [
     { path: "/define", label: "Define" },
@@ -41,12 +44,39 @@ export default function NavBar() {
           </ul>
 
           {/* Home Link */}
-          <Link 
-            href="/" 
-            className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
-          >
-            Home
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/" 
+              className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              Home
+            </Link>
+            
+            {/* Auth Button */}
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-slate-600">
+                  {user.displayName || user.email?.split('@')[0]}
+                </span>
+                <Button 
+                  onClick={signOut} 
+                  variant="outline"
+                  size="sm"
+                  className="text-slate-600 border-slate-300 hover:bg-slate-50"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                onClick={openAuthModal}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                Sign In
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </nav>

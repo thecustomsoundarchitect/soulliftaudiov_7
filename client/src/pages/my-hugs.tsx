@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { auth, db } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { collection, getDocs, query, where, deleteDoc, doc, Timestamp } from "firebase/firestore";
 import { useLocation, Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SoulHug {
   id: string;
@@ -16,6 +17,7 @@ interface SoulHug {
 }
 
 export default function MyHugs() {
+  const { user, openAuthModal } = useAuth();
   const [soulHugs, setSoulHugs] = useState<SoulHug[]>([]);
   const [filtered, setFiltered] = useState<SoulHug[]>([]);
   const [filters, setFilters] = useState({
@@ -25,23 +27,15 @@ export default function MyHugs() {
     occasion: "",
   });
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
   const [location, setLocation] = useLocation();
   const [showQrId, setShowQrId] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setLoading(false);
-      if (!user) {
-        // Don't auto-redirect, let user see sign-in prompt
-        setUser(null);
-      } else {
-        setUser(user);
-        fetchHugs(user.uid);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+    setLoading(false);
+    if (user) {
+      fetchHugs(user.uid);
+    }
+  }, [user]);
 
   const fetchHugs = async (uid: string) => {
     setLoading(true);
@@ -128,6 +122,12 @@ export default function MyHugs() {
           <h1 className="text-3xl font-bold mb-4">My Soul Hugs</h1>
           <p className="text-gray-300 mb-8">Please sign in to view your saved Soul Hugs</p>
           <div className="space-y-4">
+            <button
+              onClick={openAuthModal}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg border border-purple-400 transition-all mr-4"
+            >
+              Sign In
+            </button>
             <button
               onClick={() => setLocation("/")}
               className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg border border-white/40 transition-all"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { 
   User, 
   signInWithEmailAndPassword, 
@@ -6,16 +6,21 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  signOut,
+  signOut as firebaseSignOut,
   onAuthStateChanged,
   AuthError
 } from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
+import { auth, googleProvider, app } from '@/lib/firebase';
 import { initUserCredits } from '@/services/creditService';
+import AuthModal from '@/components/auth/AuthModal';
 
-export function useAuth() {
+// Create Auth Context
+const AuthContext = createContext<any>(null);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     console.log('Setting up auth state listener...');
@@ -28,6 +33,8 @@ export function useAuth() {
         try {
           await initUserCredits();
           console.log('User credits initialized');
+          // Close modal on successful sign-in
+          setIsAuthModalOpen(false);
         } catch (error) {
           console.error('Failed to initialize user credits:', error);
         }
@@ -152,10 +159,10 @@ export function useAuth() {
     }
   };
 
-  const logout = async () => {
+  const signOut = async () => {
     try {
       console.log('Signing out user...');
-      await signOut(auth);
+      await firebaseSignOut(auth);
       console.log('User signed out successfully');
     } catch (error) {
       console.error('Sign out error:', error);
@@ -163,12 +170,35 @@ export function useAuth() {
     }
   };
 
-  return {
+  // New functions to control auth modal
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
+
+  const value = {
     user,
     loading,
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
-    logout
+    signOut,
+    isAuthModalOpen,
+    openAuthModal,
+    closeAuthModal,
   };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      {/* Render AuthModal here, controlled by AuthContext */}
+      <AuthModal open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
