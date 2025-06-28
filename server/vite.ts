@@ -45,12 +45,12 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
-      // This path needs to be absolute from the project root.
-      // Since index.html is now at the root, we resolve to it directly.
+      // Load index.html from the client directory since Vite root is set to client
       const clientTemplate = path.resolve(
         import.meta.dirname,
         "..", // Go up from 'server/' to the project root
-        "index.html", // Directly target index.html at the root
+        "client", // Go into client directory
+        "index.html", // Target index.html in client directory
       );
 
       // always reload the index.html file from disk incase it changes
