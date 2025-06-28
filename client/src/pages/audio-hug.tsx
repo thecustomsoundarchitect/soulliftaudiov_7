@@ -653,28 +653,27 @@ You deserve all the love and happiness in the world, and I hope this message ser
 With love and gratitude`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100 font-sans"> {/* Added font-sans */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100 font-sans">
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <ProgressStepper current="Audio Hug" />
 
         {/* Message Card */}
-        <section className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 mb-10 border border-gray-100 relative"> {/* Added border */}
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 drop-shadow-sm"> {/* Increased font weight, added drop-shadow */}
+        <section className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 mb-10 border border-gray-100 relative">
+          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 drop-shadow-sm">
             Your Soul Hug Message
           </h1>
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100 shadow-inner"> {/* Added shadow-inner */}
-            <p className="text-gray-700 whitespace-pre-line leading-relaxed font-medium text-lg">{soulHugMessage}</p> {/* Increased text size */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100 shadow-inner">
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed font-medium text-lg">{soulHugMessage}</p>
           </div>
         </section>
 
-        <div className="space-y-10"> {/* Increased space between sections */}
+        <div className="space-y-10">
           {/* Voice Recording */}
           <section className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-100">
             <div className="flex items-center space-x-3 mb-4">
-              <Mic className="w-7 h-7 text-purple-600" /> {/* Increased icon size */}
-              <h2 className="text-3xl font-bold text-gray-800">Voice Recording</h2> {/* Increased heading size */}
+              <Mic className="w-7 h-7 text-purple-600" />
+              <h2 className="text-3xl font-bold text-gray-800">Voice Recording</h2>
             </div>
-            <p className="text-gray-600 mb-6 text-lg">Record your message in your own voice to add a personal touch and authentic emotion.</p> {/* Enhanced description */}
+            <p className="text-gray-600 mb-6 text-lg">Record your message in your own voice to add a personal touch and authentic emotion.</p>
             <SoulHugRecorder />
           </section>
 
@@ -721,7 +720,7 @@ With love and gratitude`;
 
         {/* Navigation */}
         <div className="flex justify-between items-center mt-8">
-          <button onClick={() => setLocation('/craft-soul-hug')} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
+          <button onClick={() => setLocation('/craft')} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
