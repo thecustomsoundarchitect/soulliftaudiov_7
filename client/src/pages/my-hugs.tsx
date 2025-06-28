@@ -300,7 +300,7 @@ export default function MyHugs() {
       <div className="flex justify-start mt-8">
         <Link href="/audio-hug" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          Back
+          Back to Audio Hug
         </Link>
       </div>
     </div>

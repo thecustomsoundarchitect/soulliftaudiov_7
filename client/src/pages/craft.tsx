@@ -330,6 +330,23 @@ export default function CraftPage() {
                 
                 {/* AI Controls */}
                 <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                  {/* Selected Descriptors Display */}
+                  {session.descriptors && session.descriptors.length > 0 && (
+                    <div className="mb-4 p-3 bg-white rounded-lg border border-slate-200">
+                      <h4 className="text-sm font-semibold text-slate-700 mb-2">Selected Descriptors:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {session.descriptors.map((descriptor, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full border border-indigo-200"
+                          >
+                            {descriptor}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="flex flex-col">
@@ -392,7 +409,7 @@ export default function CraftPage() {
                   </div>
                   
                   <div className="mt-3 text-xs text-blue-700 text-center">
-                    <span className="font-medium">Pro tip:</span> Click on ingredients from the left panel to add them to your message
+                    <span className="font-medium">Pro tip:</span> Click on ingredients from the left panel to add them to your message. Use AI Weave to create from ingredients, or AI Polish to refine existing text.
                   </div>
                 </div>
               </CardContent>
